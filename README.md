@@ -1,6 +1,6 @@
 # YT Time Machine
 
-Browse your YouTube watch history like a time machine. Filter by date, search by title or channel, and re-watch videos with autoplay — all from a local web page. Now with authentic Geocities flair.
+Browse your YouTube watch history like a time machine. Filter by date, search by title or channel, and re-watch videos with autoplay — all from a local web page.
 
 ## Setup
 
@@ -56,7 +56,7 @@ Run `make help` to see all available commands. Use `PORT=3000 make serve` to cha
 - **Shuffle** — randomize the order of filtered results
 - **Autoplay** — videos play one after another automatically
 - **Keyboard shortcuts** — `Shift+N`: next, `Shift+P`: previous, `Shift+S`: shuffle, `Shift+R`: random day
-- **Geocities aesthetic** — Comic Sans, rainbow text, animated GIFs, marquee, spinning UFOs, and a fake visitor counter
+- **Retro aesthetic** — Comic Sans, rainbow text, animated GIFs, marquee, and spinning UFOs
 
 ## Files
 
@@ -65,10 +65,7 @@ Run `make help` to see all available commands. Use `PORT=3000 make serve` to cha
 | `index.html` | The web app (single file, no dependencies) |
 | `parse.py` | Parses `watch-history.html` into `data.json` |
 | `Makefile` | Shortcuts for common commands (`make help`) |
-| `assets/` | Retro GIFs sourced from the Geocities archive |
+| `assets/` | Retro GIFs and decorations |
 | `data.json` | Generated video data (not committed) |
 | `watch-history.html` | Your Takeout export (not committed) |
 
-## Asset credits
-
-Retro GIFs sourced from [geocities.restorativland.org](https://geocities.restorativland.org/), a restored visual gallery of the archived Geocities sites.
