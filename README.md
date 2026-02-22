@@ -23,20 +23,28 @@ Browse your YouTube watch history like a time machine. Filter by date, search by
 Copy `watch-history.html` into this directory, then run:
 
 ```bash
-python3 parse.py
+make parse
 ```
 
 This generates `data.json` from the HTML file.
 
 ### 3. Serve locally
 
-The app needs to be served over HTTP (not `file://`) because it fetches `data.json`. Any simple server works:
+The app needs to be served over HTTP (not `file://`) because it fetches `data.json`:
 
 ```bash
-python3 -m http.server 8000
+make serve
 ```
 
-Then open [http://localhost:8000](http://localhost:8000)
+Then open [http://localhost:8000](http://localhost:8000).
+
+Or do both steps at once:
+
+```bash
+make dev
+```
+
+Run `make help` to see all available commands. Use `PORT=3000 make serve` to change the port.
 
 ## Features
 
@@ -54,5 +62,6 @@ Then open [http://localhost:8000](http://localhost:8000)
 |------|-------------|
 | `index.html` | The web app (single file, no dependencies) |
 | `parse.py` | Parses `watch-history.html` into `data.json` |
+| `Makefile` | Shortcuts for common commands (`make help`) |
 | `data.json` | Generated video data (not committed) |
 | `watch-history.html` | Your Takeout export (not committed) |
