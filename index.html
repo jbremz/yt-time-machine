@@ -17,10 +17,15 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    cursor: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><text y="14" font-size="14">&#x2B50;</text></svg>') 8 8, auto;
+  }
+  .geo-deco {
+    pointer-events: none;
+    image-rendering: pixelated;
   }
 
   /* Header */
@@ -36,8 +41,17 @@
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 16px;
+    text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent), 0 0 40px #ff0066;
   }
   .header h1 span { color: var(--accent); }
+  @keyframes rainbow-text {
+    0% { color: #ff0000; } 16% { color: #ff8800; } 33% { color: #ffff00; }
+    50% { color: #00ff00; } 66% { color: #0088ff; } 83% { color: #8800ff; }
+    100% { color: #ff0000; }
+  }
+  .header h1 span {
+    animation: rainbow-text 4s linear infinite;
+  }
 
   /* Controls */
   .controls {
@@ -495,7 +509,13 @@
 <body>
 
 <div class="header">
-  <h1><span>YT</span> Time Machine</h1>
+  <h1>
+    <img src="assets/star1.gif" class="geo-deco" style="vertical-align:middle;height:24px;">
+    <img src="assets/earthclouds.gif" class="geo-deco" style="vertical-align:middle;height:36px;margin-right:8px;">
+    <span>YT</span> Time Machine
+    <img src="assets/50saucer.gif" class="geo-deco" style="vertical-align:middle;height:36px;margin-left:8px;">
+    <img src="assets/star2.gif" class="geo-deco" style="vertical-align:middle;height:24px;">
+  </h1>
   <div class="controls">
     <div class="control-group">
       <label>From</label>
@@ -508,6 +528,18 @@
     <div class="control-group">
       <label>Search</label>
       <input type="text" id="search" placeholder="Title or channel...">
+    </div>
+    <div class="control-group">
+      <label>Time of day</label>
+      <select id="timeOfDay">
+        <option value="">Any time</option>
+        <option value="6-12">Morning (6am-12pm)</option>
+        <option value="12-17">Afternoon (12pm-5pm)</option>
+        <option value="17-21">Evening (5pm-9pm)</option>
+        <option value="21-24">Night (9pm-12am)</option>
+        <option value="23-4">Late Night (11pm-4am)</option>
+        <option value="0-6">Wee Hours (12am-6am)</option>
+      </select>
     </div>
     <div class="cal-picker-wrap">
       <button id="calBtn" class="cal-picker-btn">&#x1F4C5; Calendar</button>
@@ -528,12 +560,21 @@
   </div>
 </div>
 
+<div style="text-align:center;background:#000;padding:2px 0;line-height:0;">
+  <img src="assets/colorlne.gif" style="width:100%;height:12px;" alt="">
+</div>
+
 <div class="time-machine" id="timeMachine">
   <span class="label">This day in...</span>
 </div>
 
 <div class="stats" id="stats">
+  <img src="assets/sailboat.gif" class="geo-deco" style="height:32px;vertical-align:middle;margin-right:8px;">
   <span id="statText">Loading...</span>
+  <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+    <img src="assets/ginrose1.gif" class="geo-deco" style="height:24px;">
+    <img src="assets/escut1-00.gif" class="geo-deco" style="height:36px;">
+  </span>
 </div>
 
 <div class="main">
@@ -541,8 +582,14 @@
     <div class="player-container" id="playerContainer">
       <div id="ytPlayer"></div>
       <div class="player-placeholder" id="placeholder">
-        <div class="big">&#x1F4FC;</div>
+        <img src="assets/Fire_1.gif" style="width:200px;margin-bottom:16px;border-radius:8px;">
+        <div style="font-size:20px;margin-bottom:8px;">Welcome to the YT Time Machine!!</div>
         <div>Pick a video from the list or try "This day in..." to travel back in time</div>
+        <div style="margin-top:16px;display:flex;gap:16px;align-items:center;">
+          <img src="assets/sailboat.gif" class="geo-deco" style="height:48px;">
+          <img src="assets/50saucer.gif" class="geo-deco" style="height:40px;">
+          <img src="assets/earthclouds.gif" class="geo-deco" style="height:48px;">
+        </div>
       </div>
     </div>
     <div class="now-playing" id="nowPlaying" style="display:none;">
@@ -570,11 +617,27 @@
 
   <div class="sidebar">
     <div class="sidebar-header">
+      <img src="assets/star1.gif" class="geo-deco" style="height:16px;">
       <span id="playlistLabel">Videos</span>
+      <img src="assets/star2.gif" class="geo-deco" style="height:16px;">
     </div>
     <div class="video-list" id="videoList"></div>
   </div>
 </div>
+
+<div style="text-align:center;background:#000;padding:2px 0;line-height:0;">
+  <img src="assets/colorlne.gif" style="width:100%;height:12px;" alt="">
+</div>
+<marquee behavior="scroll" direction="left" scrollamount="3" style="background:var(--surface);padding:6px 0;border-top:1px solid #222;">
+  <img src="assets/sailboat.gif" style="height:32px;vertical-align:middle;margin:0 24px;">
+  <img src="assets/50saucer.gif" style="height:28px;vertical-align:middle;margin:0 24px;">
+  <img src="assets/earthclouds.gif" style="height:32px;vertical-align:middle;margin:0 24px;">
+  <img src="assets/ginrose1.gif" style="height:20px;vertical-align:middle;margin:0 24px;">
+  <img src="assets/Fire_1.gif" style="height:28px;vertical-align:middle;margin:0 24px;">
+  <img src="assets/escut1-00.gif" style="height:36px;vertical-align:middle;margin:0 24px;">
+  <img src="assets/star1.gif" style="height:20px;vertical-align:middle;margin:0 24px;">
+  <img src="assets/star2.gif" style="height:20px;vertical-align:middle;margin:0 24px;">
+</marquee>
 
 <script>
 const BATCH_SIZE = 50;
@@ -720,12 +783,29 @@ function applyFilters() {
   const to = fromInputDate(document.getElementById('dateTo').value);
   to.setHours(23, 59, 59, 999);
   const search = document.getElementById('search').value.toLowerCase().trim();
+  const todVal = document.getElementById('timeOfDay').value;
+  let todFrom = -1, todTo = -1;
+  if (todVal) {
+    const parts = todVal.split('-').map(Number);
+    todFrom = parts[0];
+    todTo = parts[1];
+  }
 
   filtered = allData.filter(e => {
     if (e._date < from || e._date > to) return false;
     if (search) {
       const haystack = (e.title + ' ' + (e.channel || '')).toLowerCase();
       if (!haystack.includes(search)) return false;
+    }
+    if (todFrom !== -1) {
+      const h = e._date.getHours();
+      if (todFrom < todTo) {
+        // Normal range e.g. 6-12
+        if (h < todFrom || h >= todTo) return false;
+      } else {
+        // Wrap-around range e.g. 23-4 means 23,0,1,2,3
+        if (h < todFrom && h >= todTo) return false;
+      }
     }
     return true;
   });
@@ -745,6 +825,7 @@ function clearFilters() {
   document.getElementById('dateFrom').value = toInputDate(new Date(Math.min(...dates)));
   document.getElementById('dateTo').value = toInputDate(new Date(Math.max(...dates)));
   document.getElementById('search').value = '';
+  document.getElementById('timeOfDay').value = '';
   document.querySelectorAll('.tm-btn').forEach(b => b.classList.remove('active'));
   filtered = [...allData];
   displayedCount = 0;
@@ -768,9 +849,31 @@ function shuffleFiltered() {
   renderBatch();
 }
 
+function matchesTimeFilter(entry, todFrom, todTo) {
+  if (todFrom === -1) return true;
+  const h = entry._date.getHours();
+  if (todFrom < todTo) {
+    return h >= todFrom && h < todTo;
+  } else {
+    return h >= todFrom || h < todTo;
+  }
+}
+
 function randomDay() {
-  // Pick a random entry and show that whole day
-  const entry = allData[Math.floor(Math.random() * allData.length)];
+  const todVal = document.getElementById('timeOfDay').value;
+  let todFrom = -1, todTo = -1;
+  if (todVal) {
+    const parts = todVal.split('-').map(Number);
+    todFrom = parts[0];
+    todTo = parts[1];
+  }
+
+  // Build list of candidate entries that match the time filter
+  const candidates = todFrom === -1 ? allData : allData.filter(e => matchesTimeFilter(e, todFrom, todTo));
+  if (candidates.length === 0) return;
+
+  // Pick a random candidate, then show all videos from that day (still time-filtered)
+  const entry = candidates[Math.floor(Math.random() * candidates.length)];
   const d = entry._date;
   const year = d.getFullYear();
   const month = d.getMonth();
@@ -779,7 +882,8 @@ function randomDay() {
   filtered = allData.filter(e =>
     e._date.getFullYear() === year &&
     e._date.getMonth() === month &&
-    e._date.getDate() === day
+    e._date.getDate() === day &&
+    matchesTimeFilter(e, todFrom, todTo)
   );
 
   const dayDate = new Date(year, month, day);

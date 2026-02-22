@@ -1,6 +1,6 @@
 # YT Time Machine
 
-Browse your YouTube watch history like a time machine. Filter by date, search by title or channel, and re-watch videos with autoplay — all from a local web page.
+Browse your YouTube watch history like a time machine. Filter by date, search by title or channel, and re-watch videos with autoplay — all from a local web page. Now with authentic Geocities flair.
 
 ## Setup
 
@@ -49,12 +49,14 @@ Run `make help` to see all available commands. Use `PORT=3000 make serve` to cha
 ## Features
 
 - **Date range filter** — pick any start/end date
+- **Calendar picker** — visual month-view calendar with activity dots showing which days have watch history; click a day or click two days to set a range
 - **Search** — filter by video title or channel name
-- **"This day in..."** — see what you watched on today's date in previous years
-- **Random Day** — jump to a random day in your history
+- **"This day in..."** — see what you watched on today's date in previous years, with a mini calendar card
+- **Random Day** — jump to a random day in your history (also the default on page load)
 - **Shuffle** — randomize the order of filtered results
 - **Autoplay** — videos play one after another automatically
-- **Keyboard shortcuts** — `]`: next, `[`: previous, `Shift+S`: shuffle, `Shift+R`: random day (click outside the player first to reclaim focus)
+- **Keyboard shortcuts** — `Shift+N`: next, `Shift+P`: previous, `Shift+S`: shuffle, `Shift+R`: random day
+- **Geocities aesthetic** — Comic Sans, rainbow text, animated GIFs, marquee, spinning UFOs, and a fake visitor counter
 
 ## Files
 
@@ -63,5 +65,10 @@ Run `make help` to see all available commands. Use `PORT=3000 make serve` to cha
 | `index.html` | The web app (single file, no dependencies) |
 | `parse.py` | Parses `watch-history.html` into `data.json` |
 | `Makefile` | Shortcuts for common commands (`make help`) |
+| `assets/` | Retro GIFs sourced from the Geocities archive |
 | `data.json` | Generated video data (not committed) |
 | `watch-history.html` | Your Takeout export (not committed) |
+
+## Asset credits
+
+Retro GIFs sourced from [geocities.restorativland.org](https://geocities.restorativland.org/), a restored visual gallery of the archived Geocities sites.
