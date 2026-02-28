@@ -493,6 +493,59 @@
     text-align: center;
   }
 
+  /* BBC News card */
+  .bbc-news {
+    background: var(--surface);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-left: auto;
+    max-width: 360px;
+    font-size: 12px;
+  }
+  .bbc-news-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .bbc-news-header .bbc-label { color: var(--accent); }
+  .bbc-news-header .toggle-arrow {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--text-dim);
+    transition: transform .2s;
+  }
+  .bbc-news.collapsed .toggle-arrow { transform: rotate(-90deg); }
+  .bbc-news-list {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .bbc-news.collapsed .bbc-news-list { display: none; }
+  .bbc-news-list li {
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bbc-news-list a {
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color .1s;
+  }
+  .bbc-news-list a:hover { color: var(--text); text-decoration: underline; }
+  .bbc-news-status { color: #666; font-size: 11px; margin-top: 4px; }
+  .bbc-news-fallback a { color: var(--accent); text-decoration: none; }
+  .bbc-news-fallback a:hover { text-decoration: underline; }
+
   /* Responsive */
   @media (max-width: 900px) {
     .main { flex-direction: column; height: auto; }
@@ -503,6 +556,7 @@
     .stats { padding: 8px 16px; }
     .controls { gap: 8px; }
     input[type="text"] { width: 150px; }
+    .bbc-news { max-width: 100%; margin-left: 0; }
   }
 </style>
 </head>
@@ -571,10 +625,16 @@
 <div class="stats" id="stats">
   <img src="assets/sailboat.gif" class="geo-deco" style="height:32px;vertical-align:middle;margin-right:8px;">
   <span id="statText">Loading...</span>
-  <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-    <img src="assets/ginrose1.gif" class="geo-deco" style="height:24px;">
-    <img src="assets/escut1-00.gif" class="geo-deco" style="height:36px;">
-  </span>
+  <div class="bbc-news" id="bbcNews">
+    <div class="bbc-news-header" id="bbcToggle">
+      <span class="bbc-label">BBC News</span>
+      <span id="bbcDate"></span>
+      <span class="toggle-arrow">&#x25BC;</span>
+    </div>
+    <ul class="bbc-news-list" id="bbcList">
+      <li class="bbc-news-status">Loading headlines...</li>
+    </ul>
+  </div>
 </div>
 
 <div class="main">
@@ -775,6 +835,7 @@ function filterThisDay(year) {
   document.getElementById('dateTo').value = toInputDate(d);
   document.getElementById('search').value = '';
   currentIndex = -1;
+  fetchBBCNews(d);
 }
 
 // Apply filters
@@ -812,6 +873,7 @@ function applyFilters() {
 
   // Clear "this day in" active
   document.querySelectorAll('.tm-btn').forEach(b => b.classList.remove('active'));
+  fetchBBCNews(from);
 
   displayedCount = 0;
   document.getElementById('videoList').innerHTML = '';
@@ -891,6 +953,7 @@ function randomDay() {
   document.getElementById('dateTo').value = toInputDate(dayDate);
   document.getElementById('search').value = '';
   document.querySelectorAll('.tm-btn').forEach(b => b.classList.remove('active'));
+  fetchBBCNews(dayDate);
 
   displayedCount = 0;
   document.getElementById('videoList').innerHTML = '';
@@ -950,6 +1013,76 @@ function renderBatch() {
     observeSentinel(sentinel);
   }
 }
+
+// BBC News via Wayback Machine
+let bbcAbort = null;
+async function fetchBBCNews(date) {
+  if (!(date instanceof Date) || isNaN(date)) return;
+  // Format date for display and API
+  const pad = n => String(n).padStart(2, '0');
+  const ts = `${date.getFullYear()}${pad(date.getMonth()+1)}${pad(date.getDate())}`;
+  const display = fmtDate(date);
+  document.getElementById('bbcDate').textContent = `\u2014 ${display}`;
+  const list = document.getElementById('bbcList');
+  list.innerHTML = '<li class="bbc-news-status">Loading headlines\u2026</li>';
+
+  if (bbcAbort) bbcAbort.abort();
+  const ctrl = new AbortController();
+  bbcAbort = ctrl;
+
+  const fallbackUrl = `https://web.archive.org/web/${ts}/https://www.bbc.co.uk/news`;
+  try {
+    // 1. Find closest snapshot of BBC RSS feed
+    const avail = await fetch(
+      `https://archive.org/wayback/available?url=feeds.bbci.co.uk/news/rss.xml&timestamp=${ts}`,
+      { signal: ctrl.signal }
+    );
+    const availJson = await avail.json();
+    const snapshot = availJson?.archived_snapshots?.closest;
+    if (!snapshot || !snapshot.available) throw new Error('No snapshot');
+
+    // 2. Fetch raw RSS XML from the snapshot
+    const rssTs = snapshot.timestamp;
+    const rssUrl = `https://web.archive.org/web/${rssTs}id_/http://feeds.bbci.co.uk/news/rss.xml`;
+    const rssRes = await fetch(rssUrl, { signal: ctrl.signal });
+    const rssText = await rssRes.text();
+
+    // 3. Parse RSS
+    const doc = new DOMParser().parseFromString(rssText, 'text/xml');
+    const items = doc.querySelectorAll('item');
+    if (items.length === 0) throw new Error('No items');
+
+    // 4. Render top 5 headlines
+    list.innerHTML = '';
+    const count = Math.min(5, items.length);
+    for (let i = 0; i < count; i++) {
+      const title = items[i].querySelector('title')?.textContent || 'Untitled';
+      const link = items[i].querySelector('link')?.textContent || fallbackUrl;
+      // Rewrite link through Wayback Machine
+      const archiveLink = link.startsWith('http')
+        ? `https://web.archive.org/web/${rssTs}/${link}`
+        : fallbackUrl;
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = archiveLink;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = title;
+      a.title = title;
+      li.appendChild(a);
+      list.appendChild(li);
+    }
+  } catch (e) {
+    if (e.name === 'AbortError') return;
+    // Fallback: show link to archived BBC News page
+    list.innerHTML = `<li class="bbc-news-fallback"><a href="${fallbackUrl}" target="_blank" rel="noopener">View BBC News from ${display} &rarr;</a></li>`;
+  }
+}
+
+// BBC News collapse toggle
+document.getElementById('bbcToggle').addEventListener('click', () => {
+  document.getElementById('bbcNews').classList.toggle('collapsed');
+});
 
 let observer;
 function observeSentinel(el) {
